@@ -1,10 +1,11 @@
 name: w2 prod
 
-on:
-  workflow_run:
-    workflows: [w1]
-    types:
-      - completed
+# on:
+#   workflow_run:
+#     workflows: [w1]
+#     types:
+#       - completed
+on: push
 
 
 jobs:
