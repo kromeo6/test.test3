@@ -11,4 +11,4 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Print Hello World
-      run: echo "Hello, World!"
+      run: echo "Hello, World! from w1"
