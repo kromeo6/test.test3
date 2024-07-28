@@ -15,3 +15,9 @@ jobs:
 
     - name: Print Hello World w2
       run: echo "Hello, World from hw2!"
+
+    - name: Print Current Branch
+      run: |
+        git fetch origin
+        branch_name=$(git rev-parse --abbrev-ref HEAD)
+        echo "Current branch: $branch_name"
