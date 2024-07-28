@@ -12,5 +12,3 @@ jobs:
 
     - name: Print Hello World
       run: echo "Hello, World!"
-    - name: Print status
-      run: echo "Workflow status: \`${{ job.status }}\`"
