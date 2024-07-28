@@ -1,7 +1,8 @@
 name: w2 prod
+
 on:
   workflow_run:
-    workflows: [w1]
+    workflows: ["w1"]
     types:
       - completed
 
