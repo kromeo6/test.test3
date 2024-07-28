@@ -1,4 +1,4 @@
-name: w1 workflow prod
+name: w1 workflow dev
 on: push
 
 
