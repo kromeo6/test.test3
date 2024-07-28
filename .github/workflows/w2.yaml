@@ -14,5 +14,5 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Print Hello World
-      run: echo "Hello, World!"
+    - name: Print Hello World w2
+      run: echo "Hello, World from w2!"
