@@ -2,10 +2,10 @@ name: w2 prod
 on:
   workflow_run:
     workflows: ["w1 workflow"]
-    types:
-      - completed
     branches:
       - test
+    types:
+      - completed
 
 jobs:
   test:
