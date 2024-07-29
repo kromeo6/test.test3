@@ -1,5 +1,9 @@
 name: w1 workflow
-on: push
+on:
+  push:
+    branches:
+      - master
+      - test
 
 
 jobs:
