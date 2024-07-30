@@ -1,0 +1,25 @@
+name: w2 prod
+on:
+  workflow_run:
+    workflows: ["w1 workflow"]
+    types:
+      - completed
+    branches:
+      - test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Print Hello World w2
+      run: echo "branch is main"
+
+    # - name: Print Current Branch
+    #   run: |
+    #     git fetch origin
+    #     branch_name=$(git rev-parse --abbrev-ref HEAD)
+    #     echo "Current branch: $branch_name"
