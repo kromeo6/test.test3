@@ -9,6 +9,7 @@ on:
 
 jobs:
   test:
+    if: github.ref == 'refs/heads/test'
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +17,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Print Hello World w2
-      run: echo "branch is main"
+      run: echo "branch is test"
 
     # - name: Print Current Branch
     #   run: |
