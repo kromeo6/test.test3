@@ -2,10 +2,10 @@ name: w2 prod
 on:
   workflow_run:
     workflows: ["w1 workflow"]
-    types: [completed]
-    branches: [test]
-    # types:
-    #   - completed
+    types:
+      - completed
+    branches:
+      - test
 
 jobs:
   test:
@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Print Hello World w2
-      run: echo "branch is test"
+      run: echo "branch is main"
 
     # - name: Print Current Branch
     #   run: |
