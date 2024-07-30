@@ -9,15 +9,17 @@ on:
 
 jobs:
   test:
-    if: github.ref == 'refs/heads/test'
+    # if: github.ref == 'refs/heads/test'
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.workflow_run.head_branch }}
 
     - name: Print Hello World w2
-      run: echo "branch is test"
+      run: echo "branch is main"
 
     # - name: Print Current Branch
     #   run: |
