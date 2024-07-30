@@ -18,6 +18,10 @@ jobs:
       with:
         ref: ${{ github.event.workflow_run.head_branch }}
 
+    - name: Print README
+      run: |
+        cat README.md
+
     - name: Print Hello World w2
       run: echo "branch is test"
 
