@@ -16,7 +16,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.workflow_run.head_branch }}
+        ref: ${{ github.event.workflow_run.head_branch }
+
+    # - name: Switch to develpment branch
+    #     run: |
+    #       cd main
+    #       git fetch origin dev:dev
+    #       git checkout dev
 
     - name: Print README
       run: |
