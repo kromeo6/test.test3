@@ -6,3 +6,4 @@ Repository Template generation powered by https://github.com/stefanbuck/cookiecu
 dev commit 1
 
 ch-pick 1
+ch-pick 2
