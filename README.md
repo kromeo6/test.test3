@@ -9,4 +9,4 @@ ch-pick 1
 ch-pick 2
 ch-pick 3
 
-main 4
+merge-b 1
