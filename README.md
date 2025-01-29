@@ -10,3 +10,5 @@ ch-pick 2
 ch-pick 3
 
 merge-b 1
+
+--------------
