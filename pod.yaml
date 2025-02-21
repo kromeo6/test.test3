@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: myns
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    command: ["/bin/sh", "-c"]
+    args: ["echo 'Hello PVC' > /var/www/html/test.txt && sleep 3600"]
+    volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: mypvc
