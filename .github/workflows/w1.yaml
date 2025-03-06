@@ -9,6 +9,13 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+          submodules: true
 
     - name: Print Hello World
       run: echo "Hello, World! from w1"
+
+    - name: List submodule directory
+      run: |
+        echo "Listing contents of the submodule directory:"
+        ls -la my-testtrit
