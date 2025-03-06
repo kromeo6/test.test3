@@ -1,0 +1,3 @@
+[submodule "my-testtrit"]
+	path = my-testtrit
+	url = https://github.com/kromeo6/testtrit.git
