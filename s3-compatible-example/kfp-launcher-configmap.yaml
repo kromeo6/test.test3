@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kfp-launcher
+  namespace: <PROFILE_NAMESPACE>
+  annotations:
+    note: "replace <PLACEHOLDER> values before applying"
+data:
+  defaultPipelineRoot: "s3://<YOUR_BUCKET_NAME>"
+  providers: |-
+    s3:
+      default:
+        endpoint: <ENDPOINT_HOST:PORT>
+        disableSSL: true           # flip to false if TLS
+        region: dummy
+        forcePathStyle: true
+        credentials:
+          fromEnv: false
+          secretRef:
+            secretName: s3-secret
+            accessKeyKey: some-key-1
+            secretKeyKey: some-key-2 
