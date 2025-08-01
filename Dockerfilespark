@@ -1,0 +1,27 @@
+# Simple Dockerfile for Spark applications with Python dependencies
+FROM docker.io/library/spark:4.0.0
+
+# Install system dependencies if needed
+USER root
+RUN apt-get update && apt-get install -y \
+    curl \
+    procps \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Copy and install Python requirements
+COPY requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Create app directory and copy source code
+WORKDIR /opt/spark/work-dir
+COPY src/ ./
+
+# Security: Set ownership
+RUN chown -R spark:spark /opt/spark/work-dir
+
+# Switch to non-root user
+USER 185
+
+# Set default command
+CMD ["python", "simple_main.py"] 
