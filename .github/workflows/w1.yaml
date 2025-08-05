@@ -19,3 +19,5 @@ jobs:
       run: |
         echo "Listing contents of the submodule directory:"
         ls -la my-testtrit
+        echo "pwd"
+        pwd
