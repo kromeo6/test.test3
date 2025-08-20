@@ -1,0 +1,43 @@
+FROM docker.io/library/spark:3.5.5-java17-python3
+
+USER root
+
+# Download Spark Connect JARs for Spark 3.5.5
+RUN curl -L https://repo1.maven.org/maven2/org/apache/spark/spark-connect_2.12/3.5.5/spark-connect_2.12-3.5.5.jar \
+    -o /opt/spark/jars/spark-connect_2.12-3.5.5.jar
+
+# Download Delta Storage 3.3.2 (compatible with Spark 3.5.5)
+RUN curl -L https://repo1.maven.org/maven2/io/delta/delta-storage/3.3.2/delta-storage-3.3.2.jar \
+    -o /opt/spark/jars/delta-storage-3.3.2.jar
+
+# Download Delta Spark 2.12 3.3.2 (compatible with Spark 3.5.5)
+RUN curl -L https://repo1.maven.org/maven2/io/delta/delta-spark_2.12/3.3.2/delta-spark_2.12-3.3.2.jar \
+    -o /opt/spark/jars/delta-spark_2.12-3.3.2.jar
+
+    # Download AWS SDK Bundle 2.24.6
+RUN curl -L https://repo1.maven.org/maven2/software/amazon/awssdk/bundle/2.24.6/bundle-2.24.6.jar \
+    -o /opt/spark/jars/aws-sdk-bundle-2.24.6.jar
+
+# Download AWS SDK URL Connection Client 2.32.19
+RUN curl -L https://repo1.maven.org/maven2/software/amazon/awssdk/url-connection-client/2.32.19/url-connection-client-2.32.19.jar \
+    -o /opt/spark/jars/aws-sdk-url-connection-client-2.32.19.jar
+
+# Download Hadoop Common 3.4.1
+RUN curl -L https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-common/3.4.1/hadoop-common-3.4.1.jar \
+    -o /opt/spark/jars/hadoop-common-3.4.1.jar
+
+# Download Hadoop Auth 3.4.1
+RUN curl -L https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-auth/3.4.1/hadoop-auth-3.4.1.jar \
+    -o /opt/spark/jars/hadoop-auth-3.4.1.jar
+
+# Download Hadoop AWS 3.4.1
+RUN curl -L https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.4.1/hadoop-aws-3.4.1.jar \
+    -o /opt/spark/jars/hadoop-aws-3.4.1.jar
+
+# Download Hadoop Client Runtime 3.4.1
+RUN curl -L https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-client-runtime/3.4.1/hadoop-client-runtime-3.4.1.jar \
+    -o /opt/spark/jars/hadoop-client-runtime-3.4.1.jar
+
+RUN chown -R spark:spark /opt/spark/jars/
+
+USER 185 
