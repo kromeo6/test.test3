@@ -1,0 +1,96 @@
+#
+# Copyright 2025 The Kubeflow authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: sparkoperator.k8s.io/v1alpha1
+kind: SparkConnect
+metadata:
+  name: spark-connect-355
+  namespace: default
+spec:
+  sparkVersion: 3.5.5
+  sparkConf:
+    "spark.sql.adaptive.enabled": "true"
+    "spark.sql.adaptive.coalescePartitions.enabled": "true"
+    
+    # AWS S3 Configuration
+    "spark.hadoop.fs.s3a.access.key": ""
+    "spark.hadoop.fs.s3a.secret.key": ""
+    "spark.hadoop.fs.s3a.endpoint": ""
+    "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem"
+
+    "spark.jars": "/opt/spark/jars/spark-connect_2.12-3.5.5.jar,
+      /opt/spark/jars/hadoop-aws-3.3.4.jar,
+      /opt/spark/jars/aws-java-sdk-s3-1.12.261.jar,
+      /opt/spark/jars/aws-java-sdk-core-1.12.261.jar,
+      /opt/spark/jars/aws-java-sdk-dynamodb-1.12.261.jar"
+  server:
+    template:
+      metadata:
+        labels:
+          key1: value1
+          key2: value2
+        annotations:
+          key3: value3
+          key4: value4
+      spec:
+        containers:
+        - name: spark-kubernetes-driver
+          image: vieno70/spark-delta:3.5.5
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 1
+              memory: 1Gi
+            limits:
+              cpu: 1
+              memory: 1Gi
+        serviceAccount: spark-operator-spark
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsGroup: 185
+          runAsUser: 185
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
+  executor:
+    instances: 1
+    cores: 1
+    memory: 512m
+    template:
+      metadata:
+        labels:
+          key1: value1
+          key2: value2
+        annotations:
+          key3: value3
+          key4: value4
+      spec:
+        containers:
+        - name: spark-kubernetes-executor
+          image: vieno70/spark-delta:3.5.5
+          imagePullPolicy: Always
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsGroup: 185
+          runAsUser: 185
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault 
