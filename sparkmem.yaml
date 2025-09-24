@@ -1,0 +1,113 @@
+#
+# Copyright 2025 The Kubeflow authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: sparkoperator.k8s.io/v1alpha1
+kind: SparkConnect
+metadata:
+  name: spark-connect
+  namespace: default
+spec:
+  sparkVersion: 4.0.0
+  sparkConf:
+    "spark.sql.adaptive.enabled": "true"
+    "spark.sql.adaptive.coalescePartitions.enabled": "true"
+    "spark.sql.extention": "io.delta.sql.DeltaSparkSessionExtension"
+    "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog"
+    
+    # Memory and performance optimizations for big data
+    "spark.driver.memory": "4g"                                        # Driver JVM heap size - increased from 1g to handle large datasets and collect operations
+    "spark.driver.maxResultSize": "2g"                                 # Max size of results collected to driver - prevents OOM when collecting large results
+    "spark.executor.memory": "4g"                                      # Executor JVM heap size - increased from 512m to process larger partitions
+    "spark.executor.memoryFraction": "0.8"                             # Fraction of executor memory for caching and task execution (80% vs 20% for storage)
+    "spark.sql.adaptive.advisoryPartitionSizeInBytes": "256MB"         # Target size for partitions after shuffle - helps with skewed data
+    "spark.sql.adaptive.maxShuffleHashJoinLocalMapThreshold": "0"      # Disables broadcast joins to prevent driver OOM with large broadcast tables
+    "spark.serializer": "org.apache.spark.serializer.KryoSerializer"  # Faster serialization than default Java serializer - reduces memory overhead
+    "spark.sql.execution.arrow.pyspark.enabled": "true"               # Enables Arrow-based data transfer between JVM and Python - faster and less memory
+
+    "spark.jars": "/opt/spark/jars/spark-connect_2.12-4.0.0.jar,
+      /opt/spark/jars/delta-storage-4.0.0.jar,
+      /opt/spark/jars/delta-spark_2.13-4.0.0.jar,
+      /opt/spark/jars/aws-sdk-bundle-2.24.6.jar,
+      /opt/spark/jars/aws-sdk-url-connection-client-2.32.19.jar,
+      /opt/spark/jars/hadoop-common-3.4.1.jar,
+      /opt/spark/jars/hadoop-auth-3.4.1.jar,
+      /opt/spark/jars/hadoop-aws-3.4.1.jar,
+      /opt/spark/jars/hadoop-client-runtime-3.4.1.jar"
+  server:
+    template:
+      metadata:
+        labels:
+          key1: value1
+          key2: value2
+        annotations:
+          key3: value3
+          key4: value4
+      spec:
+        containers:
+        - name: spark-kubernetes-driver
+          image: vieno70/spark-delta:4.0.0
+          imagePullPolicy: Always
+          resources:
+            requests:                        # Minimum guaranteed resources
+              cpu: 2                         # 2 CPU cores minimum for driver
+              memory: 6Gi                    # 6GB memory minimum (includes JVM overhead + 4g heap)
+            limits:                          # Maximum allowed resources
+              cpu: 4                         # 4 CPU cores maximum for driver
+              memory: 8Gi                    # 8GB memory maximum (safe buffer above heap size)
+        serviceAccount: spark-operator-spark
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsGroup: 185
+          runAsUser: 185
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
+  executor:
+    instances: 2                             # Number of executor pods
+    cores: 2                                 # CPU cores per executor (increased from 1 for parallel processing)
+    memory: 4g                               # Executor memory (matches spark.executor.memory config)
+    template:
+      metadata:
+        labels:
+          key1: value1
+          key2: value2
+        annotations:
+          key3: value3
+          key4: value4
+      spec:
+        containers:
+        - name: spark-kubernetes-executor
+          image: vieno70/spark-delta:4.0.0
+          imagePullPolicy: Always
+          resources:
+            requests:                        # Minimum guaranteed resources per executor
+              cpu: 2                         # 2 CPU cores minimum per executor
+              memory: 6Gi                    # 6GB memory minimum (includes JVM overhead + 4g heap)
+            limits:                          # Maximum allowed resources per executor
+              cpu: 3                         # 3 CPU cores maximum per executor
+              memory: 8Gi                    # 8GB memory maximum (safe buffer above heap size)
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsGroup: 185
+          runAsUser: 185
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
