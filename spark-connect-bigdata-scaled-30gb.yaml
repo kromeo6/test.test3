@@ -1,0 +1,177 @@
+apiVersion: sparkoperator.k8s.io/v1alpha1
+kind: SparkConnect
+metadata:
+  name: spark-connect-postgres-bigdata
+  namespace: default
+spec:
+  sparkVersion: 3.5.5
+  sparkConf:
+    # ========== SCALED MEMORY: 11 CPU / 30 GB RAM ==========
+    # Driver: 2 CPU, 3 GB | 4 Executors: 2 CPU, 6.5 GB each
+    "spark.driver.memory": "2g"
+    "spark.driver.memoryOverhead": "1g"
+    "spark.executor.memory": "5g"                 # 5 GB heap
+    "spark.executor.memoryOverhead": "1500m"      # 1.5 GB overhead
+    "spark.executor.cores": "2"
+    "spark.executor.instances": "4"
+    
+    # Memory fractions
+    "spark.memory.fraction": "0.8"
+    "spark.memory.storageFraction": "0.1"
+    
+    # Off-heap memory
+    "spark.memory.offHeap.enabled": "true"
+    "spark.memory.offHeap.size": "768m"
+    
+    # ========== PARALLELISM (8 CORES) ==========
+    "spark.default.parallelism": "32"
+    "spark.sql.shuffle.partitions": "256"
+    "spark.sql.files.maxPartitionBytes": "67108864"
+    
+    # ========== AGGRESSIVE SPILLING ==========
+    "spark.shuffle.spill.compress": "true"
+    "spark.shuffle.spill.batchSize": "8000"
+    "spark.shuffle.sort.bypassMergeThreshold": "48"
+    
+    # ========== SHUFFLE OPTIMIZATION ==========
+    "spark.shuffle.service.enabled": "false"
+    "spark.shuffle.compress": "true"
+    "spark.io.compression.codec": "lz4"
+    "spark.shuffle.file.buffer": "48k"
+    "spark.reducer.maxSizeInFlight": "72m"
+    "spark.shuffle.io.maxRetries": "10"
+    "spark.shuffle.io.retryWait": "15s"
+    
+    # ========== MEMORY MANAGEMENT ==========
+    "spark.shuffle.memoryFraction": "0.3"
+    "spark.storage.unrollFraction": "0.1"
+    
+    # ========== GC TUNING FOR 5GB HEAP ==========
+    "spark.executor.extraJavaOptions": "-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M -XX:+ParallelRefProcEnabled -XX:ConcGCThreads=2 -XX:ParallelGCThreads=4"
+    "spark.driver.extraJavaOptions": "-XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=35"
+    
+    # ========== ADAPTIVE QUERY EXECUTION ==========
+    "spark.sql.adaptive.enabled": "true"
+    "spark.sql.adaptive.coalescePartitions.enabled": "true"
+    "spark.sql.adaptive.coalescePartitions.minPartitionSize": "16mb"
+    "spark.sql.adaptive.coalescePartitions.initialPartitionNum": "256"
+    "spark.sql.adaptive.advisoryPartitionSizeInBytes": "32mb"
+    "spark.sql.adaptive.shuffle.targetPostShuffleInputSize": "32mb"
+    "spark.sql.adaptive.skewJoin.enabled": "true"
+    "spark.sql.adaptive.skewJoin.skewedPartitionFactor": "3"
+    "spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes": "256mb"
+    
+    # ========== NETWORK & TIMEOUT ==========
+    "spark.network.timeout": "800s"
+    "spark.executor.heartbeatInterval": "20s"
+    "spark.rpc.askTimeout": "800s"
+    "spark.rpc.lookupTimeout": "120s"
+    "spark.sql.broadcastTimeout": "800s"
+    
+    # ========== JDBC ==========
+    "spark.sql.jdbc.fetchSize": "8000"
+    "spark.sql.execution.arrow.pyspark.enabled": "true"
+    
+    # ========== BROADCAST ==========
+    "spark.sql.autoBroadcastJoinThreshold": "15728640"  # 15MB
+    
+    # ========== DYNAMIC ALLOCATION ==========
+    "spark.dynamicAllocation.enabled": "false"
+    
+    # ========== SERIALIZATION ==========
+    "spark.serializer": "org.apache.spark.serializer.KryoSerializer"
+    "spark.kryoserializer.buffer.max": "96m"
+    
+    # ========== SPILL & STORAGE ==========
+    "spark.storage.memoryMapThreshold": "8m"
+    "spark.cleaner.periodicGC.interval": "10min"
+    
+    # MinIO Configuration
+    "spark.hadoop.fs.s3a.access.key": "minio"
+    "spark.hadoop.fs.s3a.secret.key": "minio123"
+    "spark.hadoop.fs.s3a.endpoint": "http://minio-service.kubeflow.svc.cluster.local:9000"
+    "spark.hadoop.fs.s3a.path.style.access": "true"
+    "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem"
+    "spark.hadoop.fs.s3a.connection.ssl.enabled": "false"
+    "spark.hadoop.fs.s3a.connection.maximum": "100"
+    "spark.hadoop.fs.s3a.threads.max": "20"
+    "spark.hadoop.fs.s3a.block.size": "128M"
+
+    # Apache Iceberg Configuration
+    "spark.sql.extensions": "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+    "spark.sql.catalog.spark_catalog": "org.apache.iceberg.spark.SparkSessionCatalog"
+    "spark.sql.catalog.spark_catalog.type": "hive"
+    "spark.sql.catalog.local": "org.apache.iceberg.spark.SparkCatalog"
+    "spark.sql.catalog.local.type": "hadoop"
+    "spark.sql.catalog.local.warehouse": "s3a://test-bucket/iceberg-warehouse/"
+    "spark.sql.catalog.local.io-impl": "org.apache.iceberg.hadoop.HadoopFileIO"
+
+    "spark.jars": "/opt/spark/jars/spark-connect_2.12-3.5.5.jar,
+      /opt/spark/jars/aws-java-sdk-bundle-1.12.599.jar,
+      /opt/spark/jars/hadoop-aws-3.3.4.jar,
+      /opt/spark/jars/hadoop-client-api-3.3.4.jar,
+      /opt/spark/jars/hadoop-client-runtime-3.3.4.jar,
+      /opt/spark/jars/commons-pool-1.6.jar,
+      /opt/spark/jars/commons-pool2-2.11.1.jar,
+      /opt/spark/jars/iceberg-spark-runtime-3.5_2.12-1.9.2.jar,
+      /opt/spark/jars/postgresql-42.7.4.jar"
+  server:
+    template:
+      metadata:
+        labels:
+          app: spark-connect-bigdata
+        annotations:
+          description: "Scaled Spark: 11 CPU / 30 GB RAM"
+      spec:
+        containers:
+        - name: spark-kubernetes-driver
+          image: vieno70/spark-delta:3.5.5-postgres-bigdata
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 2
+              memory: 3Gi              # 2GB heap + 1GB overhead
+            limits:
+              cpu: 2
+              memory: 3Gi
+        serviceAccount: spark-operator-spark
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsGroup: 185
+          runAsUser: 185
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault
+  executor:
+    instances: 4
+    cores: 2
+    memory: 5g
+    template:
+      metadata:
+        labels:
+          app: spark-connect-bigdata
+      spec:
+        containers:
+        - name: spark-kubernetes-executor
+          image: vieno70/spark-delta:3.5.5-postgres-bigdata
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 2
+              memory: 6500Mi          # 5GB heap + 1.5GB overhead
+            limits:
+              cpu: 2
+              memory: 6500Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          runAsGroup: 185
+          runAsUser: 185
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          seccompProfile:
+            type: RuntimeDefault 
